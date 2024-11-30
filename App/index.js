@@ -4,9 +4,13 @@
 	
 	
 	ATA.Setups.push(()=>{
+		const PORT = 5550;
+		
 		const proxy = httpProxy.createProxyServer({
-			target: "http" + "://127.0.0.1:11434",
-			changeOrigin: true 
+			target: "http://127.0.0.1:11434",
+			changeOrigin: true,
+			//secure: false,
+			ws: true,
 		});
 		
 		const server = http.createServer((req, res)=>{
@@ -19,11 +23,8 @@
 			});
 		});
 		
-		const PORT = 5550;
 		server.listen(PORT, ()=>{
-			console.log(`Proxy sunucusu ${PORT} portunda çalışıyor. Tüm istekler localhost:11434 adresine yönlendiriliyor.`);
+			console.log("Proxy [" + PORT + "] başlatıldı.");
 		});
 	});
 })(require("ata.js")());
-
-
