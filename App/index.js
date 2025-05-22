@@ -1,36 +1,35 @@
 ((ATA)=>{
-	const express = ATA.Require('express');
-	const request = ATA.Require('request');
+	const Express = ATA.Require("express");
+	const Request = ATA.Require("request");
 	
 	const PROTOCOL = "http";
 	const ADDRESS = "127.0.0.1";
 	const PORT_INNER = 11434;
 	const PORT_OUTER = 5550;
+	const PATH_INNER = "";
+	const PATH_OUTER = "";
 	
 	ATA.Setups.push(()=>{
-		const app = express();
+		const app = Express();
 		
-		const target = PROTOCOL + ":" + "//" + ADDRESS + ":" + PORT_INNER;
+		const target = PROTOCOL + ":" + "//" + ADDRESS + ":" + PORT_INNER + PATH_INNER;
 		
-		/*
-		app.use((req, res, next) => {
-			console.log(`[${req.method}] ${req.url}`);
-			next();
-		});
-		*/
-		
-		app.use((req, res)=>{
-			const url = target + req.url;
+		app.use("/" + PATH_OUTER, (req_, res_)=>{
+			const url = target + req_.url;
 			
-			const req_ = request({
+			const request = Request({
 				url,
-				method: req.method,
-				headers: req.headers
+				method: req_.method,
+				headers: {
+					"X-Forwarded-For": req_.ip,
+					...req_.headers
+				}
 			});
 			
-			req
-				.pipe(req_)
-				.pipe(res);
+			req_
+				.pipe(request)
+				// middlewares
+				.pipe(res_);
 			
 		});
 		
